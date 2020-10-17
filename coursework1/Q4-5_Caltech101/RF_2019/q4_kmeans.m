@@ -114,7 +114,7 @@ for i = 1:num_class
         x = 1 : length(hist_matrix(i*j, :));
         plot(x, hist_matrix(i*j,:));
         %}
-        disp(hist_matrix(i*j, :));
+        %disp(hist_matrix(i*j, :));
         
     end
 end
