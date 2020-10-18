@@ -125,30 +125,75 @@ switch MODE
         
         % Build visual vocabulary (codebook) for 'Bag-of-Words method'
         desc_sel = single(vl_colsubset(cat(2,desc_tr{:}), num_desc)); % Randomly select 100k SIFT descriptors for clustering
-        disp(size(desc_sel));
+        %disp(size(desc_sel));
         
         % K-means clustering
-        numBins = 256; % for instance,
+        numBins = 20; % for instance,
         
         
         % write your own codes here
         % ...
         % TODO!!
+        
+        
+        
         num_class = 10; % For example, there are 10 classes
         num_elem = 15; % Each class has 15 elements
         
-        bag_of_words = zeros(num_class*num_elem, numBins); % bag of wors model for counting appearance of codebook
+        
+        % value to return
+        % data_train: n by ((hist, label))
+        %           : ex) data_train[k][
+        data_train = cell(num_class*num_elem, 3);
+        disp('here');
+        
         for i = 1:num_class
+            disp(i);
             for j = 1:num_elem
-                desc_ij = desc_tr{i, j}; % descriptors of class i, jth img
-                %disp(size(desc_ij));
-                
-                dim_desc_ij = size(desc_ij); % dimension of desc_ij
-                num_descriptor = dim_desc_ij(2); % number of descriptors
+                % Do some process for each Img
                 
                 
                 
                 
+                % descriptors of class i, jth img
+                % 128 by (num of descriptor) matrix
+                % number of descriptors may be different by image
+                desc_ij = double(desc_tr{i, j}); 
+                
+                
+                % 1. K-means clustering(using internal lib)
+                X = transpose(desc_ij);
+                [idx, C] = kmeans(X, numBins);
+                
+                
+                % 2. Assign the nearest descriptor for each class mean
+                [K, d] = size(C); % k by n matrix C, k is num of clusters
+                
+                codewords = cell(1, K);
+                hist = zeros(1, K);
+                
+                
+                for k = 1:K
+                    cluster_center = C(k,:); % extract kth row(cluster center vector in d dim)
+                    descriptors = transpose(desc_sel); % 100K descriptors
+                    
+                    % compute Euclidean distance
+                    distances = sqrt(sum(bsxfun(@minus, descriptors, cluster_center).^2, 2));
+                    
+                    % find the closest
+                    closest = descriptors(find(distances == min(distances)), :);
+                    
+                    
+                    % assign value to hist_matrix and codewords
+                    [freq, temp] = size(X(idx == k, 1));
+                    hist(k) = freq;
+                    codewords(k) = {closest(1,:)};
+                    
+                end
+                
+                % training Dataset
+                data_train((i - 1)*15 + j,:) = {hist, codewords, i};
+                %disp(data_train((i - 1)*15 + j, :));
                 
             end
         end
@@ -199,10 +244,6 @@ switch MODE
             
             end
             
-            X = 1;
-            Y = 1;
-            data_query = desc_te;
-            
         end
         
         %suptitle('Testing image samples');
@@ -215,6 +256,62 @@ switch MODE
         
         % write your own codes here
         % ...
+        num_class = 10; % For example, there are 10 classes
+        num_elem = 15; % Each class has 15 elements
+        
+        
+        % value to return
+        data_query = cell(num_class*num_elem, 3);
+        
+        for i = 1:num_class
+            for j = 1:num_elem
+                % Do some process for each Img
+                
+                
+                
+                
+                % descriptors of class i, jth img
+                % 128 by (num of descriptor) matrix
+                % number of descriptors may be different by image
+                desc_ij = double(desc_te{i, j}); 
+                
+                
+                % 1. K-means clustering(using internal lib)
+                %X = transpose(desc_ij);
+                %[idx, C] = kmeans(X, numBins);
+                
+                
+                % 2. Assign the nearest descriptor for each class mean
+                %[K, d] = size(C); % k by n matrix C, k is num of clusters
+                
+                codewords = cell(1, K);
+                hist = zeros(1, K);
+                
+                
+                for k = 1:K
+                    cluster_center = C(k,:); % extract kth row(cluster center vector in d dim)
+                    descriptors = transpose(desc_sel); % 100K descriptors
+                    
+                    % compute Euclidean distance
+                    distances = sqrt(sum(bsxfun(@minus, descriptors, cluster_center).^2, 2));
+                    
+                    % find the closest
+                    closest = descriptors(find(distances == min(distances)), :);
+                    
+                    
+                    % assign value to hist_matrix and codewords
+                    [freq, temp] = size(X(idx == k, 1));
+                    hist(k) = freq;
+                    codewords(k) = {closest(1,:)};
+                    
+                end
+                
+                % training Dataset
+                data_query((i - 1)*15 + j,:) = {hist, codewords, i};
+                %disp(data_train((i - 1)*15 + j, :));
+                
+            end
+        end
         
         
         
