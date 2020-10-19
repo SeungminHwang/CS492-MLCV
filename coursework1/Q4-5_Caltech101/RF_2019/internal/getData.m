@@ -128,14 +128,12 @@ switch MODE
         %disp(size(desc_sel));
         
         % K-means clustering
-        numBins = 20; % for instance,
+        numBins = 7; % for instance,
         
         
         % write your own codes here
         % ...
         % TODO!!
-        
-        
         
         num_class = 10; % For example, there are 10 classes
         num_elem = 15; % Each class has 15 elements
@@ -144,8 +142,16 @@ switch MODE
         % value to return
         % data_train: n by ((hist, label))
         %           : ex) data_train[k][
-        data_train = cell(num_class*num_elem, 3);
-        disp('here');
+        %data_train = cell(num_class*num_elem, 3);
+        
+        
+        % https://www.vlfeat.org/matlab/vl_kmeans.html
+        % l1 for manhattan distance
+        % l2 for euclidian distance
+        [centers, assignments] = vl_kmeans(desc_sel, numBins, 'distance', 'l2');
+        disp(size(centers));
+        
+        %{
         
         for i = 1:num_class
             disp(i);
@@ -197,7 +203,7 @@ switch MODE
                 
             end
         end
-        
+        %}
         
         
                   
@@ -206,6 +212,34 @@ switch MODE
         
         % write your own codes here
         % ...
+        
+        data_train = zeros(num_class*num_elem, numBins);
+        for i = 1:num_class
+            for j = 1:num_elem
+                desc_ij = double(desc_tr{i, j});
+                [d, num_desc] = size(desc_ij);
+                %disp(size(desc_ij));
+                
+                
+                for k = 1:num_desc
+                    feature = desc_ij(:,k);
+                    min_dist = inf;
+                    idx = 1;
+                    for l = 1:numBins % iterate for each classes
+                        dist = sum((feature - centers(:,l)).^2)/length(feature);
+                        
+                        if min_dist > dist
+                            min_dist = dist;
+                            idx = l;
+                        end
+                    end
+                    data_train((i-1)*num_elem+j,idx) = data_train((i-1)*num_elem+j,idx) + 1;
+                end
+                
+            end
+        end
+        
+        
   
         
         % Clear unused varibles to save memory
@@ -261,54 +295,28 @@ switch MODE
         
         
         % value to return
-        data_query = cell(num_class*num_elem, 3);
+        %data_query = cell(num_class*num_elem, 3);
         
+        data_query = zeros(num_class*num_elem, numBins);
         for i = 1:num_class
             for j = 1:num_elem
-                % Do some process for each Img
+                desc_ij = double(desc_te{i, j});
+                [d, num_desc] = size(desc_ij);
                 
                 
-                
-                
-                % descriptors of class i, jth img
-                % 128 by (num of descriptor) matrix
-                % number of descriptors may be different by image
-                desc_ij = double(desc_te{i, j}); 
-                
-                
-                % 1. K-means clustering(using internal lib)
-                %X = transpose(desc_ij);
-                %[idx, C] = kmeans(X, numBins);
-                
-                
-                % 2. Assign the nearest descriptor for each class mean
-                %[K, d] = size(C); % k by n matrix C, k is num of clusters
-                
-                codewords = cell(1, K);
-                hist = zeros(1, K);
-                
-                
-                for k = 1:K
-                    cluster_center = C(k,:); % extract kth row(cluster center vector in d dim)
-                    descriptors = transpose(desc_sel); % 100K descriptors
-                    
-                    % compute Euclidean distance
-                    distances = sqrt(sum(bsxfun(@minus, descriptors, cluster_center).^2, 2));
-                    
-                    % find the closest
-                    closest = descriptors(find(distances == min(distances)), :);
-                    
-                    
-                    % assign value to hist_matrix and codewords
-                    [freq, temp] = size(X(idx == k, 1));
-                    hist(k) = freq;
-                    codewords(k) = {closest(1,:)};
-                    
+                for k = 1:num_desc
+                    feature = desc_ij(:,k);
+                    min = inf;
+                    idx = 1;
+                    for l = 1:numBins % iterate for each classes
+                        dist = sum((feature - centers(:,l)).^2)/length(feature);
+                        if min > dist
+                            min = dist;
+                            idx = l;
+                        end
+                    end
+                    data_query((i-1)*num_elem+j,idx) = data_query((i-1)*num_elem+j,idx) + 1;
                 end
-                
-                % training Dataset
-                data_query((i - 1)*15 + j,:) = {hist, codewords, i};
-                %disp(data_train((i - 1)*15 + j, :));
                 
             end
         end
