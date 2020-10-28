@@ -69,7 +69,7 @@ function [time_train, time_test] = rf_classifier_analysis( MODE , payload, data_
         %plot confusion matrix
         nexttile;
         ax = confusionchart(single(c'), single(data_query(:, end)));
-        ax.Title = sprintf('%s = %d, Accuracy: %.2f',text, i, accuracy);
+        ax.Title = sprintf('%s = %d, Accuracy: %.2f',text, payload(i), accuracy);
         
         
     end
