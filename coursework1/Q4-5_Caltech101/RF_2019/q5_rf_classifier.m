@@ -4,7 +4,7 @@
 
 % generate training and testing data
 
-showImg = 0;
+showImg = 1;
 
 PHOW_Sizes = [4 8 10];
 PHOW_Step = 8;
@@ -61,6 +61,7 @@ num_desc = 10e5;
 
 % Build visual vocabulary (codebook) for 'Bag-of-Words method'
 desc_sel = single(vl_colsubset(cat(2,desc_tr{:}), num_desc)); % Randomly select 100k SIFT descriptors for clustering
+
 
 
 % K-means clustering
@@ -176,16 +177,20 @@ clearvars desc_te
 
 %% Random Forest Test
 
-[time_train, time_test] = rf_classifier_basic(data_train, data_query);
+[time_train, time_test, accur] = rf_classifier_basic(data_train, data_query);
+
 
 %% numTree
-                         
-[t_train_nT, t_test_nT] = rf_classifier_analysis('numTree', [4, 16, 64, 128, 256, 512], data_train, data_query);
+numTrees_payload = [4, 16, 64, 128, 256, 512];
+%numTrees_payload = [1, 2, 3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
+[t_train_nT, t_test_nT, accur_nT] = rf_classifier_analysis('numTree', numTrees_payload, data_train, data_query, 0);
 
 %% numDepth
-[t_train_nD, t_test_nD] = rf_classifier_analysis('numDepth', [2, 4, 8, 10, 12, 16], data_train, data_query);
+numDepth_payload = [2, 4, 8, 10, 12, 16];
+[t_train_nD, t_test_nD, accur_nD] = rf_classifier_analysis('numDepth', numDepth_payload, data_train, data_query, 1);
 
 %% numSplitNum
-
-[t_train_nSN, t_test_nSN] = rf_classifier_analysis('numSplitNum', [1, 16, 64, 128, 256, 512], data_train, data_query);
+numSplitNum_payload = [1, 3, 10, 50, 100, 150];
+numSplitNum_payload = [1, 3, 10, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180];
+[t_train_nSN, t_test_nSN, accur_nSN] = rf_classifier_analysis('numSplitNum', numSplitNum_payload, data_train, data_query, 0);
 
