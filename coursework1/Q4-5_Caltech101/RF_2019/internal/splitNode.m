@@ -19,15 +19,59 @@ data = data(idx,:);
 [N,D] = size(data);
 ig_best = -inf; % Initialise best information gain
 idx_best = [];
+
 for n = 1:iter
-    
     % Split function - Modify here and try other types of split function
+    switch(param.weakLearner)
+        case 'Axis-aligned'
+            dim = randi(D-1); % Pick one random dimension
+            d_min = single(min(data(:,dim))) + eps; % Find the data range of this dimension
+            d_max = single(max(data(:,dim))) - eps;
+            t = d_min + rand*((d_max-d_min)); % Pick a random value within the range as threshold
+            idx_ = data(:,dim) < t;
+        case '2-pixel'
+            dim = randperm((D-1), 2);
+            idx_i = dim(1);
+            idx_j = dim(2);
+            
+            x_i = data(:, idx_i);
+            x_j = data(:, idx_j);
+            
+            dist = x_i - x_j;
+            
+            d_min = single(min(dist)) + eps;
+            d_max = single(max(dist)) - eps;
+            
+            t = d_min + rand * ((d_max - d_min));
+            idx_ = dist < t;
+        case 'linear'
+            cond = true;
+            while cond
+                dim = randperm(D-1, 2);
+                
+                t = randn(3, 1);
+                idx_ = [data(:, dim), ones(N, 1)]*t < 0;
+                cond = isequal(idx_, zeros(size(idx_))) || isequal(idx_, ones(size(idx_)));
+            end
+        case 'non-linear'
+            cond = true;
+            while cond
+                dim = randperm(D-1, 2);
+                t = randn(3, 3);
+                %t = randn(3, 1);
+                idx_ = zeros(0);
+                for i = 1:N
+                    isLeft = [data(i, dim), 1]*t*[data(i, dim), 1]' < 0;
+                    if isLeft
+                        idx_ = cat(1, idx_, i);
+                    end
+                end
+                %disp((phi*t*phi'));
+                size_idx = size(idx_);
+                cond = isequal(idx_, zeros(size(idx_))) || isequal(idx_, ones(size(idx_))) || size_idx(1) < 3;
+            end
+    end
     
-    dim = randi(D-1); % Pick one random dimension
-    d_min = single(min(data(:,dim))) + eps; % Find the data range of this dimension
-    d_max = single(max(data(:,dim))) - eps;
-    t = d_min + rand*((d_max-d_min)); % Pick a random value within the range as threshold
-    idx_ = data(:,dim) < t;
     
     ig = getIG(data,idx_); % Calculate information gain
     

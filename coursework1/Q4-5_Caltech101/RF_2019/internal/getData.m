@@ -131,7 +131,7 @@ switch MODE
         disp(size(desc_sel));
         
         % K-means clustering
-        numBins = 4; % for instance,
+        numBins = 64; % for instance,
         
         
         % write your own codes here

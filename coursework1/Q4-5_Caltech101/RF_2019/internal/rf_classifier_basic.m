@@ -1,12 +1,12 @@
 %rf_classifier_analysis_helper
-function [time_train, time_test] = rf_classifier_basic(data_train, data_query)
+function [time_train, time_test, accuracy] = rf_classifier_basic(data_train, data_query)
 
     % Default Settings
     param.num = 500;
     param.depth = 5;
     param.splitNum = 3;
     param.split = 'IG';
-    param.weakLearner = 'Axis_aligned';
+    param.weakLearner = 'Axis-aligned';
     
     %train
     tic;
@@ -17,7 +17,7 @@ function [time_train, time_test] = rf_classifier_basic(data_train, data_query)
     figure;
     tiledlayout(1, 1);
     
-    time_test = 0;
+    
     
     
     tic;
@@ -31,10 +31,11 @@ function [time_train, time_test] = rf_classifier_basic(data_train, data_query)
     [~,c] = max(prob_mean');
     accuracy = sum(c == data_query(:, end)')/length(c);
 
-    dt = toc;
-    time_train = time_train + dt; % add test time_i
-
-
+    time_test = toc;
+    
+    disp(single(c'));
+    disp(single(data_query(:,end)));
+    
     %plot confusion matrix
     nexttile;
     ax = confusionchart(single(c'), single(data_query(:, end)));
