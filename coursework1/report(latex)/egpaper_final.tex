@@ -6,7 +6,7 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
-
+\usepackage{subcaption}
 % Include other packages here, before hyperref.
 
 % If you comment hyperref and then uncomment it, you should delete
@@ -25,7 +25,7 @@
 \begin{document}
 
 %%%%%%%%% TITLE
-\title{\LaTeX\ Author Guidelines for CVPR Proceedings}
+\title{MLCV Coursework 1 Reports}
 
 \author{First Author\\
 Institution1\\
@@ -58,387 +58,168 @@ First line of institution2 address\\
 \end{abstract}
 
 %%%%%%%%% BODY TEXT
-\section{Introduction}
-
-Please follow the steps outlined below when submitting your manuscript to
-the IEEE Computer Society Press.  This style guide now has several
-important modifications (for example, you are no longer warned against the
-use of sticky tape to attach your artwork to the paper), so all authors
-should read this new version.
+\section{Computationally Efficient Eigenfaces} \label{low pca}
+Eigen faces are basis set of training image dataset. By using them, we can reconstruct or recognize faces. To make eigen faces of given images, we have to apply PCA to covariance matrix of images. This operation is quite time and space consuming while PCA needs cubic of feature dimension time for its computation. To solve this problem, we employed low-dimensional PCA, which can be used when number of training dataset is quite smaller than dimension of feature.
 
 %-------------------------------------------------------------------------
-\subsection{Language}
-
-All manuscripts must be in English.
-
-\subsection{Dual submission}
-
-Please refer to the author guidelines on the CVPR 2016 web page for a
-discussion of the policy on dual submissions.
-
-\subsection{Paper length}
-Papers, excluding the references section,
-must be no longer than eight pages in length. The references section
-will not be included in the page count, and there is no limit on the
-length of the references section. For example, a paper of eight pages
-with two pages of references would have a total length of 10 pages.
-{\bf There will be no extra page charges for
-  CVPR 2016.}
-
-Overlength papers will simply not be reviewed.  This includes papers
-where the margins and formatting are deemed to have been significantly
-altered from those laid down by this style guide.  Note that this
-\LaTeX\ guide already sets figure captions and references in a smaller font.
-The reason such papers will not be reviewed is that there is no provision for
-supervised revisions of manuscripts.  The reviewing process cannot determine
-the suitability of the paper for presentation in eight pages if it is
-reviewed in eleven.  
-
-%-------------------------------------------------------------------------
-\subsection{The ruler}
-The \LaTeX\ style defines a printed ruler which should be present in the
-version submitted for review.  The ruler is provided in order that
-reviewers may comment on particular lines in the paper without
-circumlocution.  If you are preparing a document using a non-\LaTeX\
-document preparation system, please arrange for an equivalent ruler to
-appear on the final output pages.  The presence or absence of the ruler
-should not change the appearance of any other content on the page.  The
-camera ready copy should not contain a ruler. (\LaTeX\ users may uncomment
-the \verb'\cvprfinalcopy' command in the document preamble.)  Reviewers:
-note that the ruler measurements do not align well with lines in the paper
---- this turns out to be very difficult to do well when the paper contains
-many figures and equations, and, when done, looks ugly.  Just use fractional
-references (e.g.\ this line is $095.5$), although in most cases one would
-expect that the approximate location will be adequate.
-
-\subsection{Mathematics}
-
-Please number all of your sections and displayed equations.  It is
-important for readers to be able to refer to any particular equation.  Just
-because you didn't refer to it in the text doesn't mean some future reader
-might not need to refer to it.  It is cumbersome to have to use
-circumlocutions like ``the equation second from the top of page 3 column
-1''.  (Note that the ruler will not be present in the final copy, so is not
-an alternative to equation numbers).  All authors will benefit from reading
-Mermin's description of how to write mathematics:
-\url{http://www.pamitc.org/documents/mermin.pdf}.
-
-
-\subsection{Blind review}
-
-Many authors misunderstand the concept of anonymizing for blind
-review.  Blind review does not mean that one must remove
-citations to one's own work---in fact it is often impossible to
-review a paper unless the previous citations are known and
-available.
-
-Blind review means that you do not use the words ``my'' or ``our''
-when citing previous work.  That is all.  (But see below for
-techreports.)
-
-Saying ``this builds on the work of Lucy Smith [1]'' does not say
-that you are Lucy Smith; it says that you are building on her
-work.  If you are Smith and Jones, do not say ``as we show in
-[7]'', say ``as Smith and Jones show in [7]'' and at the end of the
-paper, include reference 7 as you would any other cited work.
-
-An example of a bad paper just asking to be rejected:
-\begin{quote}
-\begin{center}
-    An analysis of the frobnicatable foo filter.
-\end{center}
-
-   In this paper we present a performance analysis of our
-   previous paper [1], and show it to be inferior to all
-   previously known methods.  Why the previous paper was
-   accepted without this analysis is beyond me.
-
-   [1] Removed for blind review
-\end{quote}
-
-
-An example of an acceptable paper:
-
-\begin{quote}
-\begin{center}
-     An analysis of the frobnicatable foo filter.
-\end{center}
-
-   In this paper we present a performance analysis of the
-   paper of Smith \etal [1], and show it to be inferior to
-   all previously known methods.  Why the previous paper
-   was accepted without this analysis is beyond me.
-
-   [1] Smith, L and Jones, C. ``The frobnicatable foo
-   filter, a fundamental contribution to human knowledge''.
-   Nature 381(12), 1-213.
-\end{quote}
-
-If you are making a submission to another conference at the same time,
-which covers similar or overlapping material, you may need to refer to that
-submission in order to explain the differences, just as you would if you
-had previously published related work.  In such cases, include the
-anonymized parallel submission~\cite{Authors14} as additional material and
-cite it as
-\begin{quote}
-[1] Authors. ``The frobnicatable foo filter'', F\&G 2014 Submission ID 324,
-Supplied as additional material {\tt fg324.pdf}.
-\end{quote}
-
-Finally, you may feel you need to tell the reader that more details can be
-found elsewhere, and refer them to a technical report.  For conference
-submissions, the paper must stand on its own, and not {\em require} the
-reviewer to go to a techreport for further details.  Thus, you may say in
-the body of the paper ``further details may be found
-in~\cite{Authors14b}''.  Then submit the techreport as additional material.
-Again, you may not assume the reviewers will read this material. 
-
-Sometimes your paper is about a problem which you tested using a tool which
-is widely known to be restricted to a single institution.  For example,
-let's say it's 1969, you have solved a key problem on the Apollo lander,
-and you believe that the CVPR70 audience would like to hear about your
-solution.  The work is a development of your celebrated 1968 paper entitled
-``Zero-g frobnication: How being the only people in the world with access to
-the Apollo lander source code makes us a wow at parties'', by Zeus \etal.
-
-You can handle this paper like any other.  Don't write ``We show how to
-improve our previous work [Anonymous, 1968].  This time we tested the
-algorithm on a lunar lander [name of lander removed for blind review]''.
-That would be silly, and would immediately identify the authors. Instead
-write the following:
-\begin{quotation}
-\noindent
-   We describe a system for zero-g frobnication.  This
-   system is new because it handles the following cases:
-   A, B.  Previous systems [Zeus et al. 1968] didn't
-   handle case B properly.  Ours handles it by including
-   a foo term in the bar integral.
-
-   ...
-
-   The proposed system was integrated with the Apollo
-   lunar lander, and went all the way to the moon, don't
-   you know.  It displayed the following behaviours
-   which show how well we solved cases A and B: ...
-\end{quotation}
-As you can see, the above text follows standard scientific convention,
-reads better than the first version, and does not explicitly name you as
-the authors.  A reviewer might think it likely that the new paper was
-written by Zeus \etal, but cannot make any decision based on that guess.
-He or she would have to be sure that no other authors could have been
-contracted to solve problem B.
-
-FAQ: Are acknowledgements OK?  No.  Leave them for the final copy.
-
+\subsection{Comparison between PCA and low-dimensional PCA} \label{comp}
 
 \begin{figure}[t]
 \begin{center}
-\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
-   %\includegraphics[width=0.8\linewidth]{egfigure.eps}
+   \includegraphics[width=0.8\linewidth]{fig1.png}
 \end{center}
-   \caption{Example of caption.  It is set in Roman so that mathematics
-   (always set in Roman: $B \sin A = A \sin B$) may be included without an
-   ugly clash.}
-\label{fig:long}
-\label{fig:onecol}
+   \caption{Plot of nonzero eigenvalues of PCA and low-dimensional PCA
+(low-PCA). Nonzero eigenvalues of each matrix are identical.}
+\label{fig:eigen}
 \end{figure}
 
-\subsection{Miscellaneous}
-
-\noindent
-Compare the following:\\
-\begin{tabular}{ll}
- \verb'$conf_a$' &  $conf_a$ \\
- \verb'$\mathit{conf}_a$' & $\mathit{conf}_a$
-\end{tabular}\\
-See The \TeX book, p165.
-
-The space after \eg, meaning ``for example'', should not be a
-sentence-ending space. So \eg is correct, {\em e.g.} is not.  The provided
-\verb'\eg' macro takes care of this.
-
-When citing a multi-author paper, you may save space by using ``et alia'',
-shortened to ``\etal'' (not ``{\em et.\ al.}'' as ``{\em et}'' is a complete word.)
-However, use it only when there are three or more authors.  Thus, the
-following is correct: ``
-   Frobnication has been trendy lately.
-   It was introduced by Alpher~\cite{Alpher02}, and subsequently developed by
-   Alpher and Fotheringham-Smythe~\cite{Alpher03}, and Alpher \etal~\cite{Alpher04}.''
-
-This is incorrect: ``... subsequently developed by Alpher \etal~\cite{Alpher03} ...''
-because reference~\cite{Alpher03} has just two authors.  If you use the
-\verb'\etal' macro provided, then you need not worry about double periods
-when used at the end of a sentence as in Alpher \etal.
-
-For this citation style, keep multiple citations in numerical (not
-chronological) order, so prefer \cite{Alpher03,Alpher02,Authors14} to
-\cite{Alpher02,Alpher03,Authors14}.
+As result, number of nonzero eigenvalues in covariance matrix 
+$S=\frac{1}{N} A A^{T}$ is same with number of nonzero eigenvalues in
+ matrix $\frac{1}{N} A ^{T}A$. Moreover, as we can see in 
+Figure~\ref{fig:eigen} nonzero eigenvalues of each matrix are same. Also,
+ if we multipy A to eigenvectors of low-dimensional matrix, they become same
+ with eigenvectors of covariance matrix. However, while their resulting values
+ and vectors are identical, their time complexities are different. Let feature
+ dimension D and number of training data N. Then, computing covariance
+ matrix and finding eigenvalues and eigenvectors of covariance matrix S
+ takes $O(N D^{2} + D^{3})$. Low-dimensional PCA takes 
+$O(2N^{2}D + N^{3})$ to compute low-dimensional matrix, find eigenvectors,
+ eigenvalues and multiply A to eigenvectors. So, if D is much bigger than N,
+ low-dimensional PCA takes less computation time. However, if N is
+ compatible with D, additional matrix multiplying with A might make 
+low-dimensional PCA takes more time than original PCA. In our case, while
+ N(416) is relatively smaller than D(2576), low-dimensional PCA takes less
+ time to compute eigenfaces. Table~\ref{table:results} shows and compare
+ training time of PCA and low-dimensional PCA.
 
 
-\begin{figure*}
+
+\begin{table*}
 \begin{center}
-\fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
-\end{center}
-   \caption{Example of a short caption, which should be centered.}
-\label{fig:short}
-\end{figure*}
-
-%------------------------------------------------------------------------
-\section{Formatting your paper}
-
-All text must be in a two-column format. The total allowable width of the
-text area is $6\frac78$ inches (17.5 cm) wide by $8\frac78$ inches (22.54
-cm) high. Columns are to be $3\frac14$ inches (8.25 cm) wide, with a
-$\frac{5}{16}$ inch (0.8 cm) space between them. The main title (on the
-first page) should begin 1.0 inch (2.54 cm) from the top edge of the
-page. The second and following pages should begin 1.0 inch (2.54 cm) from
-the top edge. On all pages, the bottom margin should be 1-1/8 inches (2.86
-cm) from the bottom edge of the page for $8.5 \times 11$-inch paper; for A4
-paper, approximately 1-5/8 inches (4.13 cm) from the bottom edge of the
-page.
-
-%-------------------------------------------------------------------------
-\subsection{Margins and page numbering}
-
-All printed material, including text, illustrations, and charts, must be kept
-within a print area 6-7/8 inches (17.5 cm) wide by 8-7/8 inches (22.54 cm)
-high.
-Page numbers should be in footer with page numbers, centered and .75
-inches from the bottom of the page and make it start at the correct page
-number rather than the 4321 in the example.  To do this fine the line (around
-line 23)
-\begin{verbatim}
-%\ifcvprfinal\pagestyle{empty}\fi
-\setcounter{page}{4321}
-\end{verbatim}
-where the number 4321 is your assigned starting page.
-
-Make sure the first page is numbered by commenting out the first page being
-empty on line 46
-\begin{verbatim}
-%\thispagestyle{empty}
-\end{verbatim}
-
-
-%-------------------------------------------------------------------------
-\subsection{Type-style and fonts}
-
-Wherever Times is specified, Times Roman may also be used. If neither is
-available on your word processor, please use the font closest in
-appearance to Times to which you have access.
-
-MAIN TITLE. Center the title 1-3/8 inches (3.49 cm) from the top edge of
-the first page. The title should be in Times 14-point, boldface type.
-Capitalize the first letter of nouns, pronouns, verbs, adjectives, and
-adverbs; do not capitalize articles, coordinate conjunctions, or
-prepositions (unless the title begins with such a word). Leave two blank
-lines after the title.
-
-AUTHOR NAME(s) and AFFILIATION(s) are to be centered beneath the title
-and printed in Times 12-point, non-boldface type. This information is to
-be followed by two blank lines.
-
-The ABSTRACT and MAIN TEXT are to be in a two-column format.
-
-MAIN TEXT. Type main text in 10-point Times, single-spaced. Do NOT use
-double-spacing. All paragraphs should be indented 1 pica (approx. 1/6
-inch or 0.422 cm). Make sure your text is fully justified---that is,
-flush left and flush right. Please do not place any additional blank
-lines between paragraphs.
-
-Figure and table captions should be 9-point Roman type as in
-Figures~\ref{fig:onecol} and~\ref{fig:short}.  Short captions should be centred.
-
-\noindent Callouts should be 9-point Helvetica, non-boldface type.
-Initially capitalize only the first word of section titles and first-,
-second-, and third-order headings.
-
-FIRST-ORDER HEADINGS. (For example, {\large \bf 1. Introduction})
-should be Times 12-point boldface, initially capitalized, flush left,
-with one blank line before, and one blank line after.
-
-SECOND-ORDER HEADINGS. (For example, { \bf 1.1. Database elements})
-should be Times 11-point boldface, initially capitalized, flush left,
-with one blank line before, and one after. If you require a third-order
-heading (we discourage it), use 10-point Times, boldface, initially
-capitalized, flush left, preceded by one blank line, followed by a period
-and your text on the same line.
-
-%-------------------------------------------------------------------------
-\subsection{Footnotes}
-
-Please use footnotes\footnote {This is what a footnote looks like.  It
-often distracts the reader from the main flow of the argument.} sparingly.
-Indeed, try to avoid footnotes altogether and include necessary peripheral
-observations in
-the text (within parentheses, if you prefer, as in this sentence).  If you
-wish to use a footnote, place it at the bottom of the column on the page on
-which it is referenced. Use Times 8-point type, single-spaced.
-
-
-%-------------------------------------------------------------------------
-\subsection{References}
-
-List and number all bibliographical references in 9-point Times,
-single-spaced, at the end of your paper. When referenced in the text,
-enclose the citation number in square brackets, for
-example~\cite{Authors14}.  Where appropriate, include the name(s) of
-editors of referenced books.
-
-\begin{table}
-\begin{center}
-\begin{tabular}{|l|c|}
+\begin{tabular}{|l|ccc|}
 \hline
-Method & Frobnability \\
+Method & Training Time(sec) & Reconstruction Error & Recognition Accuracy(\%) \\
 \hline\hline
-Theirs & Frumpy \\
-Yours & Frobbly \\
-Ours & Makes one's heart Frob\\
+PCA & 9.36 & - & - \\
+low-PCA & 0.79 & 11.93 & 62.5 \\
+PCA-LDA & 17.50 & X & 92.3 \\
+subset PCA & 0.14 & 22.84 & 61.5 \\
+Incremental PCA & 0.54 & 18.46 & 62.5\\
 \hline
 \end{tabular}
 \end{center}
-\caption{Results.   Ours is better.}
-\end{table}
+\caption{Results. Reconstruction error is measured by rmse with $m_{pca} = 50$.
+ Recognition Accuracy is measured with $m_{pca} = 50$ for low-PCA, subset PCA and incremental PCA. $m_{pca} = 100, m_{lda} = 50$ is used for PCA-LDA}
+\label{table:results}
+\end{table*}
 
+\subsection{Face Reconstruction}
+With eigenfaces optained from above section, we can reconstruct any given faces. Specifically,
+ we optained basis of training face data and any face can be projected to our face space.
+Then, we can express those faces by linear combination of several eigenfaces. There are 415
+eigenvectors with nonzero eigenvalues. Indeed, we can reconstruct all faces in training data exactly
+ with 415 eigenfaces. Figure~\ref{fig:sfig1}~\ref{fig:sfig2}~\ref{fig:sfig3} shows using more eigenfaces
+can make more smillar faces and using 415 eigenfaces could reconstruct almost same face.
+ However, several faces in test data cannot be reconstructed exactly, because 
+test face could not be included in train face space. By comparing Figure~\ref{fig:sfig3} and Figure~\ref{fig:sfig4},
+we can see that Figure~\ref{fig:sfig3} is reconstructed correctly with 415 bases, while
+Figure~\ref{fig:sfig4} failed with same number of bases.
+
+\begin{figure*}
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{fig4.png}
+  \caption{Reconstructed face with 10 bases}
+  \label{fig:sfig1}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{fig5.png}
+  \caption{Reconstructed face with 100 bases}
+  \label{fig:sfig2}
+\end{subfigure}
+
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{fig6.png}
+  \caption{Reconstructed face with 415 bases}
+  \label{fig:sfig3}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{fig3.png}
+  \caption{Failed image}
+  \label{fig:sfig4}
+\end{subfigure}
+\caption{Plots of reconstructed faces.}
+\label{fig:recon face}
+\end{figure*}
+%--------------------------------------------------------------------------
+\section{PCA-LDA for Face Recognition}
+
+LDA increase variance of features between other classes and decrease variance 
+between same classes. In this section, we explore the effect of apllying LDA over
+ PCA on face recognition accuracy in many aspects. Classifier used in this section
+ is KNeighborsClassifier of python scipy library, which employed default settings.
+
+\subsection{Recognition accuracy}
+Let's first talk about recognition accuracy with PCA only method. As we can see in Figure~\ref{fig:acc PCA}, accuracy of 62\% is achieved with 50 bases and saturated. On the other hand, recognition accuracy of PCA-LDA method is quite interesting. Using higher $m_{pca}$ increases accuracy of recognition, because it can represent each face more accurately. Peak accuracy is achieved with $m_{pca} = 364$ and $m_{lda} = 31$(100\%), and it suddenly fall down with higher $m_{lda}$. It could be caused by curse of dimension. Rank of within-class scatter matrix is $N - n_{class} = 416-52 = 364$ and rank of between-class scatter matrix is $n_{class} - 1 = 52 - 1 = 51$. While LDA has atmost rank of $(W^T_{PCA}S_W W_{PCA})^{-1}(W^T_{PCA}S_B W_{PCA})$nonzero eigenvectors, it has 51 nonzero eigenvectors. It means using $m_{lda}$ larger than 51 cannnot increase variance of between-class features and decrease variance  of within-class features. While variance is fixed, increasing dimension complicates classificatin because nn classification is based on eucledian distance, but too high dimension makes distance too large, eventhough they are in same class.
+
+\begin{figure}
+\begin{center}
+   \includegraphics[width=0.8\linewidth]{fig9.png}
+\end{center}
+   \caption{Accuracy of face recognition with PCA}
+\label{fig:acc PCA}
+\end{figure}
+
+
+\begin{figure}
+\begin{center}
+   \includegraphics[width=0.8\linewidth]{fig7.png}
+\end{center}
+   \caption{Accuracy of face recognition with PCA-LDA}
+\label{fig:acc PCA-LDA}
+\end{figure}
+
+\subsection{Example of success and fail faces}
+
+There are few examples of success and fail cases. Figure~\ref{fig:success} shows successfully predicted faces. While test face in first row of Figure~\ref{fig:success} seems sharper than other faces in same class, our classifier successfully predict its class. In failure cases(Figure~\ref{fig:fail}), test face have simillar hairstyle with faces in wrong predicted class. It could be hard to classify them with other high accuracy classifiers.
+
+\begin{figure}
+\begin{center}
+   \includegraphics[width=0.8\linewidth]{fig11.png}
+\end{center}
+   \caption{Predict successed faces. First column shows test faces and second to fourth columns shows train faces included in class of successfully predicted.}
+\label{fig:success}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+   \includegraphics[width=0.8\linewidth]{fig10.png}
+\end{center}
+   \caption{Predict failed faces. First column shows test faces and second to fourth columns shows train faces included in class of wrong predicted}
+\label{fig:fail}
+\end{figure}
+
+\subsection{Time and memory}
+
+Table~\ref{table:results} briefly compare computation time of PCA and PCA-LDA methods with fixed parameters. As explained in Section~\ref{comp}, low-PCA takes $O(2N^{2}D + N^{3})$ time. However, LDA takes $O(NDmin(N,D) + \min(N,D)^3)$ time complexity and $O(ND + N\min(N,D)+D\min(N,D))$ memory. PCA-LDA has strong tradeoff between accuracy and time-memory comsumption.
 %-------------------------------------------------------------------------
-\subsection{Illustrations, graphs, and photographs}
+\section{Incremental PCA}
 
-All graphics should be centered.  Please ensure that any point you wish to
-make is resolvable in a printed copy of the paper.  Resize fonts in figures
-to match the font in the body text, and choose line widths which render
-effectively in print.  Many readers (and reviewers), even of an electronic
-copy, will choose to print your paper in order to read it.  You cannot
-insist that they do otherwise, and therefore must not assume that they can
-zoom in to see tiny details on a graphic.
+In the reality, there could be case that we could not get full training data at once and given with some time gap. With normal PCA or low-dimensional PCA, we have to train model from the bottom if training data is transformed. Incremental PCA is useful strategy for such data transformation. We also can reduce training time with Incremental PCA.
 
-When placing figures in \LaTeX, it's almost always best to use
-\verb+\includegraphics+, and to specify the  figure width as a multiple of
-the line width as in the example below
-{\small\begin{verbatim}
-   \usepackage[dvips]{graphicx} ...
-   \includegraphics[width=0.8\linewidth]
-                   {myfile.eps}
-\end{verbatim}
-}
+\subsection{Comparison with other PCAs}
+
+There are normal PCA, low-dimensional PCA, PCA-LDA, PCA with one subset and incremental PCA. In our case, we want to deal with situation of gradual data incoming. So there are three PCA we can use in this situation: low-PCA, PCA with first subset and incremental PCA. In Table~\ref{table:results}, we now can compare these PCA strategies. Using one subset PCA is fast, but it have big reconstruction error and low recognition accuracy. This is because small data brings low rank face space and low accuracy reconstruction of faces in test dataset. Low-dimensional PCA has highest reconstruction error and lowest recognition accuracy. Also, it seems time consumption is very compatitable with subset PCA and incremental PCA. However, its fact only with much low number of dataset than face dimension. As we can see in comparison for PCA and one subset PCA, training time cubicly increases. But incremental PCA does not. It have reasonable reconstruction error and recognition accuracy. Also, it's training time does not increase cubicly, and it is sum of all 4 subset PCA and time for merge them: it means, in real situation, we need very few time to merge new data with existing PCA model.   
 
 
-%-------------------------------------------------------------------------
-\subsection{Color}
-
-Please refer to the author guidelines on the CVPR 2016 web page for a discussion
-of the use of color in your document.
-
-%------------------------------------------------------------------------
-\section{Final copy}
-
-You must include your signed IEEE copyright release form when you submit
-your finished paper. We MUST have this form before your paper can be
-published in the proceedings.
 
 
 {\small
 \bibliographystyle{ieee}
-\bibliography{egbib}
+%\bibliography{egbib}
 }
 
 \end{document}
