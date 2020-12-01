@@ -6,7 +6,9 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{subcaption}
+
+\usepackage{kotex}
+
 % Include other packages here, before hyperref.
 
 % If you comment hyperref and then uncomment it, you should delete
@@ -21,11 +23,11 @@
 
 % Pages are numbered in submission mode, and unnumbered in camera-ready
 %\ifcvprfinal\pagestyle{empty}\fi
-\setcounter{page}{4321}
+\setcounter{page}{1}
 \begin{document}
 
 %%%%%%%%% TITLE
-\title{MLCV Coursework 1 Reports}
+\title{MLCV Coursework 1 Report}
 
 \author{First Author\\
 Institution1\\
@@ -37,189 +39,325 @@ Institution1 address\\
 % just like the second author.
 % To save space, use either the email address or home page, not both
 \and
-Second Author\\
-Institution2\\
-First line of institution2 address\\
-{\tt\small secondauthor@i2.org}
+Seungmin Hwang\\
+20180736\\
+Department of Physics\\
+{\tt\small min.hwang@kaist.ac.kr}
 }
 
 \maketitle
 %\thispagestyle{empty}
 
-%%%%%%%%% ABSTRACT
-\begin{abstract}
-   The ABSTRACT is to be in fully-justified italicized text, at the top
-   of the left-hand column, below the author and affiliation
-   information. Use the word ``Abstract'' as the title, in 12-point
-   Times, boldface type, centered relative to the column, initially
-   capitalized. The abstract is to be in 10-point, single-spaced type.
-   Leave two blank lines after the Abstract, then begin the main text.
-   Look at previous CVPR abstracts to get a feel for style and length.
-\end{abstract}
 
 %%%%%%%%% BODY TEXT
-\section{Computationally Efficient Eigenfaces} \label{low pca}
-Eigen faces are basis set of training image dataset. By using them, we can reconstruct or recognize faces. To make eigen faces of given images, we have to apply PCA to covariance matrix of images. This operation is quite time and space consuming while PCA needs cubic of feature dimension time for its computation. To solve this problem, we employed low-dimensional PCA, which can be used when number of training dataset is quite smaller than dimension of feature.
-
-%-------------------------------------------------------------------------
-\subsection{Comparison between PCA and low-dimensional PCA} \label{comp}
-
-\begin{figure}[t]
-\begin{center}
-   \includegraphics[width=0.8\linewidth]{fig1.png}
-\end{center}
-   \caption{Plot of nonzero eigenvalues of PCA and low-dimensional PCA
-(low-PCA). Nonzero eigenvalues of each matrix are identical.}
-\label{fig:eigen}
-\end{figure}
-
-As result, number of nonzero eigenvalues in covariance matrix 
-$S=\frac{1}{N} A A^{T}$ is same with number of nonzero eigenvalues in
- matrix $\frac{1}{N} A ^{T}A$. Moreover, as we can see in 
-Figure~\ref{fig:eigen} nonzero eigenvalues of each matrix are same. Also,
- if we multipy A to eigenvectors of low-dimensional matrix, they become same
- with eigenvectors of covariance matrix. However, while their resulting values
- and vectors are identical, their time complexities are different. Let feature
- dimension D and number of training data N. Then, computing covariance
- matrix and finding eigenvalues and eigenvectors of covariance matrix S
- takes $O(N D^{2} + D^{3})$. Low-dimensional PCA takes 
-$O(2N^{2}D + N^{3})$ to compute low-dimensional matrix, find eigenvectors,
- eigenvalues and multiply A to eigenvectors. So, if D is much bigger than N,
- low-dimensional PCA takes less computation time. However, if N is
- compatible with D, additional matrix multiplying with A might make 
-low-dimensional PCA takes more time than original PCA. In our case, while
- N(416) is relatively smaller than D(2576), low-dimensional PCA takes less
- time to compute eigenfaces. Table~\ref{table:results} shows and compare
- training time of PCA and low-dimensional PCA.
-
-
-
-\begin{table*}
-\begin{center}
-\begin{tabular}{|l|ccc|}
-\hline
-Method & Training Time(sec) & Reconstruction Error & Recognition Accuracy(\%) \\
-\hline\hline
-PCA & 9.36 & - & - \\
-low-PCA & 0.79 & 11.93 & 62.5 \\
-PCA-LDA & 17.50 & X & 92.3 \\
-subset PCA & 0.14 & 22.84 & 61.5 \\
-Incremental PCA & 0.54 & 18.46 & 62.5\\
-\hline
-\end{tabular}
-\end{center}
-\caption{Results. Reconstruction error is measured by rmse with $m_{pca} = 50$.
- Recognition Accuracy is measured with $m_{pca} = 50$ for low-PCA, subset PCA and incremental PCA. $m_{pca} = 100, m_{lda} = 50$ is used for PCA-LDA}
-\label{table:results}
-\end{table*}
-
-\subsection{Face Reconstruction}
-With eigenfaces optained from above section, we can reconstruct any given faces. Specifically,
- we optained basis of training face data and any face can be projected to our face space.
-Then, we can express those faces by linear combination of several eigenfaces. There are 415
-eigenvectors with nonzero eigenvalues. Indeed, we can reconstruct all faces in training data exactly
- with 415 eigenfaces. Figure~\ref{fig:sfig1}~\ref{fig:sfig2}~\ref{fig:sfig3} shows using more eigenfaces
-can make more smillar faces and using 415 eigenfaces could reconstruct almost same face.
- However, several faces in test data cannot be reconstructed exactly, because 
-test face could not be included in train face space. By comparing Figure~\ref{fig:sfig3} and Figure~\ref{fig:sfig4},
-we can see that Figure~\ref{fig:sfig3} is reconstructed correctly with 415 bases, while
-Figure~\ref{fig:sfig4} failed with same number of bases.
-
-\begin{figure*}
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=.8\linewidth]{fig4.png}
-  \caption{Reconstructed face with 10 bases}
-  \label{fig:sfig1}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=.8\linewidth]{fig5.png}
-  \caption{Reconstructed face with 100 bases}
-  \label{fig:sfig2}
-\end{subfigure}
-
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=.8\linewidth]{fig6.png}
-  \caption{Reconstructed face with 415 bases}
-  \label{fig:sfig3}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=.8\linewidth]{fig3.png}
-  \caption{Failed image}
-  \label{fig:sfig4}
-\end{subfigure}
-\caption{Plots of reconstructed faces.}
-\label{fig:recon face}
-\end{figure*}
-%--------------------------------------------------------------------------
+\section{Computationally Efficient Eigenfaces}
 \section{PCA-LDA for Face Recognition}
-
-LDA increase variance of features between other classes and decrease variance 
-between same classes. In this section, we explore the effect of apllying LDA over
- PCA on face recognition accuracy in many aspects. Classifier used in this section
- is KNeighborsClassifier of python scipy library, which employed default settings.
-
-\subsection{Recognition accuracy}
-Let's first talk about recognition accuracy with PCA only method. As we can see in Figure~\ref{fig:acc PCA}, accuracy of 62\% is achieved with 50 bases and saturated. On the other hand, recognition accuracy of PCA-LDA method is quite interesting. Using higher $m_{pca}$ increases accuracy of recognition, because it can represent each face more accurately. Peak accuracy is achieved with $m_{pca} = 364$ and $m_{lda} = 31$(100\%), and it suddenly fall down with higher $m_{lda}$. It could be caused by curse of dimension. Rank of within-class scatter matrix is $N - n_{class} = 416-52 = 364$ and rank of between-class scatter matrix is $n_{class} - 1 = 52 - 1 = 51$. While LDA has atmost rank of $(W^T_{PCA}S_W W_{PCA})^{-1}(W^T_{PCA}S_B W_{PCA})$nonzero eigenvectors, it has 51 nonzero eigenvectors. It means using $m_{lda}$ larger than 51 cannnot increase variance of between-class features and decrease variance  of within-class features. While variance is fixed, increasing dimension complicates classificatin because nn classification is based on eucledian distance, but too high dimension makes distance too large, eventhough they are in same class.
-
-\begin{figure}
-\begin{center}
-   \includegraphics[width=0.8\linewidth]{fig9.png}
-\end{center}
-   \caption{Accuracy of face recognition with PCA}
-\label{fig:acc PCA}
-\end{figure}
-
-
-\begin{figure}
-\begin{center}
-   \includegraphics[width=0.8\linewidth]{fig7.png}
-\end{center}
-   \caption{Accuracy of face recognition with PCA-LDA}
-\label{fig:acc PCA-LDA}
-\end{figure}
-
-\subsection{Example of success and fail faces}
-
-There are few examples of success and fail cases. Figure~\ref{fig:success} shows successfully predicted faces. While test face in first row of Figure~\ref{fig:success} seems sharper than other faces in same class, our classifier successfully predict its class. In failure cases(Figure~\ref{fig:fail}), test face have simillar hairstyle with faces in wrong predicted class. It could be hard to classify them with other high accuracy classifiers.
-
-\begin{figure}
-\begin{center}
-   \includegraphics[width=0.8\linewidth]{fig11.png}
-\end{center}
-   \caption{Predict successed faces. First column shows test faces and second to fourth columns shows train faces included in class of successfully predicted.}
-\label{fig:success}
-\end{figure}
-
-\begin{figure}
-\begin{center}
-   \includegraphics[width=0.8\linewidth]{fig10.png}
-\end{center}
-   \caption{Predict failed faces. First column shows test faces and second to fourth columns shows train faces included in class of wrong predicted}
-\label{fig:fail}
-\end{figure}
-
-\subsection{Time and memory}
-
-Table~\ref{table:results} briefly compare computation time of PCA and PCA-LDA methods with fixed parameters. As explained in Section~\ref{comp}, low-PCA takes $O(2N^{2}D + N^{3})$ time. However, LDA takes $O(NDmin(N,D) + \min(N,D)^3)$ time complexity and $O(ND + N\min(N,D)+D\min(N,D))$ memory. PCA-LDA has strong tradeoff between accuracy and time-memory comsumption.
-%-------------------------------------------------------------------------
 \section{Incremental PCA}
 
-In the reality, there could be case that we could not get full training data at once and given with some time gap. With normal PCA or low-dimensional PCA, we have to train model from the bottom if training data is transformed. Incremental PCA is useful strategy for such data transformation. We also can reduce training time with Incremental PCA.
 
-\subsection{Comparison with other PCAs}
+\section{K-means Codebook}
+\subsection{Visual codebook generation wiht K-means clustering}
+By applying dense SIFT feature description, features descriptor vectors can be obtained from the given dataset (Caltech-101). There are lots of descriptors from this process. But It’s more convenient to consider only randomly selected 100K descriptors. It will save memory and the computation time.\\
 
-There are normal PCA, low-dimensional PCA, PCA-LDA, PCA with one subset and incremental PCA. In our case, we want to deal with situation of gradual data incoming. So there are three PCA we can use in this situation: low-PCA, PCA with first subset and incremental PCA. In Table~\ref{table:results}, we now can compare these PCA strategies. Using one subset PCA is fast, but it have big reconstruction error and low recognition accuracy. This is because small data brings low rank face space and low accuracy reconstruction of faces in test dataset. Low-dimensional PCA has highest reconstruction error and lowest recognition accuracy. Also, it seems time consumption is very compatitable with subset PCA and incremental PCA. However, its fact only with much low number of dataset than face dimension. As we can see in comparison for PCA and one subset PCA, training time cubicly increases. But incremental PCA does not. It have reasonable reconstruction error and recognition accuracy. Also, it's training time does not increase cubicly, and it is sum of all 4 subset PCA and time for merge them: it means, in real situation, we need very few time to merge new data with existing PCA model.   
+In this dataset, whole number of descriptors form 150 images is around 410K, which order is almost same with 100K. Therefore, the information loss from randomly selecting 100K descriptor is not too much.\\
+
+Then, with certain number $K$ and 100K descriptor vector, by using K-means clustering, the $K$ representative codeword for this dataset can be obtained. Let d be the dimension of the descriptor vector. Firstly, pick $K$ random $d$ dimensional vector for center of each clusters. Then, assign the descriptor vectors to the nearest center and update the cluster center by calculating the mean value of the cluster. Repeat this assign-update process until the cluster center converges.\\
+
+This will be visual codebook generated with K-means clustering.\\
+This visual codebook has $K$ codewords and each word is $d$ dimensional vector.\\
+
+
+\subsection{Vector quantisation process}
+In the previous section, descriptor vectors can be obtained from images. Let's apply this process to the single image. Then we can get the set of $N$ descriptor vectors where $N$ can be different by the images.\\
+With this set of descriptors and centroids from K-means clustering, we can apply k-Nearest Neighbor (kNN) algorithms to get certain vector.\\
+
+
+
+
+
+
+
+
+\subsection{Computation time analysis}
+The time complexity of K-means clustering is known as $O(N'KD)$ where $N'$ is number of the descriptor vectors (data point), $K$ is number of clusters and $D$ is the dimension of the descriptor vector.\\
+
+And the vector quantization process for the train data and query data,
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.30\textwidth]{./assets/k-means_graph.png}
+    \caption{Computation time for each process}
+    \label{fig:k-means-time}
+\end{figure}
+
+
+
+
+\subsection{Bag-of-words histogram of images}
+From the previous process, $K$ dimensional vector can be obtained from each image. The components of this vector are the frequency of correponding codeword. That is, if there are two different images but in the same class, they are more likely to have common codewords. // TODO:\\
+
+Figure \ref{fig:k-means-hist-1} is sample images and corresponding bag-of-words histograms with $K = 64$.
+
+
+Let's do some qulitative analysis.\\
+From the figure \ref{fig:k-means-hist-1} (a), among the trilobite images, we can find that there exist significant codewords that specify the image is trilobite.\\
+However, in the Figure \ref{fig:k-means-hist-1} (b), it seems there exist significant codeword if we only consider right two images, but if we include the left most image, it's hard to say unique feature.
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.25\textwidth]{./assets/kmeans_hist_1.png}\\
+    (a)\\
+    \includegraphics[width=0.25\textwidth]{./assets/kmeans_hist_2.png}\\
+    (b)
+    \caption{Sample image and corresponding histogram}
+    \label{fig:k-means-hist-1}
+\end{figure}
+
+Then, what about value of $K$ lower and higher than 64?
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.25\textwidth]{./assets/K4_kmeans.png}
+    \caption{Computation time for each process}
+    \label{fig:K4_kmeans}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.25\textwidth]{./assets/K512_kmeans.png}
+    \caption{Computation time for each process}
+    \label{fig:K512_kmeans}
+\end{figure}
+
+
+
+\section{RF Classifier}
+\subsection{RF classifier with K-means codebook}
+Random Forest classifier (RF classifier) is the randomised decision forest which performs classification. The RF for classification can be build with set of data vectors with label. Randomisation processes are done in two ways: randomising training set and randomised feature selection. Mostly, these increase the generallity.
+
+//TODO
+
+The train and test data can be obtained from the result of Section 4. In this section, we obtained bag of visual words histogram for each images from the Caltech-101 dataset.\\
+Let $d$ be the cardinality of K-means codebook, the the histogram data can be $d$ dimensional vector, which components are frequencies of correspoding codeword. And there's a label which specifies what this image is.\\
+With this data and label, we can apply RF classifer to solve classification problems.
+
+
+
+
+
+\subsection{Vocabularay size and RF classifier}
+The RF classification performances(memory, execution time, accuraccy and so forth) can be also affected by the size of visual vocabulary.
+
+Let's consider the random forest which parameter has default value of:
+\begin{table}[h]
+    \begin{center}
+        \begin{tabular}{|l|c|}
+        \hline
+        Parameter & Default Value\\
+        \hline\hline
+        Number of the Trees & 100 \\
+        Number of depths & 5 \\
+        Split Number & 3\\
+        Objective Function & IG\\
+        Weak Learner & Axis aligned\\
+        \hline
+        \end{tabular}
+    \end{center}
+    \caption{Default parameters of Random Forest}
+    \label{table:defaultParams}
+\end{table}
+
+Figure \ref{fig:numBinsRFperform} shows that the test accuracy is almost monotonically increasing about vocabulary size. At $K = 8$, the mean test accuracy was 0.49068. When the vocabulary size is doubled($K = 16$) the mean test accuracy is increased by 0.6220. But, since the increasing rate of accuracy is rapidly goes to zero, for the sufficiently large vocabulary size, the size will not affect to the accuracy while the training time is higly increased.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.22\textwidth]{./assets/Q5/numBins_RF_time.png}
+    \includegraphics[width=0.22\textwidth]{./assets/Q5/numBins_RF_accu.png}
+    \caption{ Consumed time (left), accuracy (right)}
+    \label{fig:numBinsRFperform}
+\end{figure}
+
+Figure \ref{fig:numBinsConfusion} shows that how many tests was successful by each classes of images. Classifier with 8 visual words has 6 classes with accuracy less than 0.5. By contrast, Classifier with 1024 visual words has only 2 classes with accuracy less thant 0.5. This demonstrates that better classifier can be obtained by using larger codebook.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.22\textwidth]{./assets/Q5/numBinsConfusionK8.png}
+    \includegraphics[width=0.22\textwidth]{./assets/Q5/numBinsConfusionK1024.png}
+    \caption{Confusion matrix of $K=8$ (left), $K=1024$ (right)}
+    \label{fig:numBinsConfusion}
+\end{figure}
+
+
+
+\subsection{Parameters for RF classifier}
+
+The Randomized Descision Forest(RF) can be adjusted by the value of parameters. In our RF model, there are parameters: number of trees, number of depth, type of weak learners and so forth.\\
+The result on the below is how the computation time and accuracy will be changed if the value of some parameter is changed. Let's consider the forest with parameters are same in the Table \ref{table:defaultParams}.
+
+\subsubsection{Number of Trees}
+
+
+The single decision tree tends to highly overfit to data. To prevent, using ensembles of slightly different tree will be very helpful for generalisation.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.22\textwidth]{./assets/Q5/numTree_time.png}
+    \includegraphics[width=0.22\textwidth]{./assets/Q5/numTree_accuracy.png}
+    \caption{Sample image and corresponding histogram}
+    \label{fig:analysis-numTree}
+\end{figure}
+
+
+In the Figure \ref{fig:analysis-numTree}, the number of trees is changed from 1 to 1000. For small number like 1 has very low test accuracy. But if we slightly increse the number of tree by 100, then the test accuracy is increased to around 0.6. After 100, the test accuracy is just fluctuating around 0.6.
+
+The computation time for training is increasing linearly in number of trees and for testing is increasing logarithmically. This results agree with expectation since the 
+
+The best choice of this parameter is around 100.
+
+\subsubsection{Depth of Trees}
+
+Depth of Trees parameter is the maximum depth of trees. This paramteter can be one of stopping criteria when the RF is fistly generated with training data. This paramter decides the tree structures. 
+Depth of Trees is the paramter deciding the tree structures. This paramter provides stopping criteria when the RF is fistly generated.\\
+In the Figure \ref{fig:analysis-numDepth}, the test accuracy is gradually increasing over the depth but the training time grows exponetial order. 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.22\textwidth]{./assets/Q5/numDepth_time.png}
+    \includegraphics[width=0.22\textwidth]{./assets/Q5/numDepth_accu.png}
+    \caption{Sample image and corresponding histogram}
+    \label{fig:analysis-numDepth}
+\end{figure}
+
+
+
+
+\subsubsection{Split Number}
+When the RF classifier be built, node split task is done for non-terminal nodes. In the node plit task, we just randomly select one component of vector, compare with the thresshold. This task done by $\rho$ time, which called the randomness parameter.\\
+Since the one component of data vector does not have entire data, $\rho$ should be certain number of larger than 1. Figure \ref{fig:analysis-SplitNum} shows the result with many different $\rho$ vaules.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.22\textwidth]{./assets/Q5/splitNum_time.png}
+    \includegraphics[width=0.22\textwidth]{./assets/Q5/splitNum_accu.png}
+    \caption{Sample image and corresponding histogram}
+    \label{fig:analysis-SplitNum}
+\end{figure}
+For $\rho = 3, 10, 50$, the accuracy fluctuating around 0.6, and after that the accuracy is gradually falls while the training time grows linearly.
+Once $\rho$ increases, randomness decreases. If $\rho$ is sufficiently large number, then all of the tree has identical shapes.
+
+\subsubsection{Type of Weak Learner}
+Until now, all of the calculation was based on axis-aligned split function. Let's compare the performance of each split function. RF classification result is 
+\begin{table}[ht]
+    \centering
+    \begin{center}
+        two pixel\\
+        \begin{tabular}{|l|c|c|}
+        \hline
+        Index & Time (s) & stdev \\
+        \hline\hline
+        Train time & 2.19918 & 0.113488202\\
+        Test time & 0.18562 & 0.016719211\\
+        Accuracy & 0.55602 & 0.020343721\\
+        \hline
+        \end{tabular}
+    \end{center}
+    \begin{center}
+        axis-aligned\\
+        \begin{tabular}{|l|c|c|}
+        \hline
+        Index & Time (s) & stdev \\
+        \hline\hline
+        Train time & 2.40044 & 0.070384324\\
+        Test time & 0.12416 & 0.003166702\\
+        Accuracy & 0.6720 & 0.009893938\\
+        \hline
+        \end{tabular}
+    \end{center}
+
+    \begin{center}
+        Linear\\
+        \begin{tabular}{|l|c|c|}
+        \hline
+        Index & Time (s) & stdev \\
+        \hline\hline
+        Train time & 3.2615 & 0.172281041\\
+        Test time & 0.1952 & 0.14564903\\
+        Accuracy & 0.5933 & 0.009900657\\
+        \hline
+        \end{tabular}
+    \end{center}
+    \caption{Performance of two split functions}
+    
+    \label{table:cat_su}
+\end{table}
+
+
+
+\subsection{Success and Failure Analysis}
+Figure \ref{fig:numBinsConfusion} demontsrates this RF classifier is especially weak for the class umbrella(3) and wild\_cat(7). Let's investigate success and failure cases. For more cases, please refer to the appendix.
+\begin{table}[ht]
+    \centering
+    \begin{center}
+        \begin{tabular}{|l|c|c|}
+        \hline
+        Test Image & True Class & predicted class\\
+        \hline\hline
+        \includegraphics[width=0.1\textwidth]{./assets/Q5/su/cat_s1.png} & 7 & 7 \\
+        \hline
+        \includegraphics[width=0.1\textwidth]{./assets/Q5/su/cat_s2.png} & 7 & 7\\
+        \hline
+        \includegraphics[width=0.1\textwidth]{./assets/Q5/su/cat_s3.png} & 7 & 7\\
+        \hline
+        \includegraphics[width=0.1\textwidth]{./assets/Q5/su/cat_f1.png} & 7 & 6\\
+        \hline
+        \includegraphics[width=0.1\textwidth]{./assets/Q5/su/cat_f2.png} & 7 & 5\\
+        \hline
+        \end{tabular}
+    \end{center}
+    \caption{Sucess and failure case examples}
+    
+    \label{table:cat_su}
+\end{table}
+
+\begin{table}[ht]
+    \centering
+    \begin{center}
+
+        \begin{tabular}{|l|c|c|}
+        \hline
+        Test Image & True Class & predicted class\\
+        \hline\hline
+        \includegraphics[width=0.1\textwidth]{./assets/Q5/su/umb_s1.png} & 3 & 3 \\
+        \hline
+        \includegraphics[width=0.1\textwidth]{./assets/Q5/su/umb_s2.png} & 3 & 3\\
+        \hline
+        \includegraphics[width=0.1\textwidth]{./assets/Q5/su/umb_s3.png} & 3 & 3\\
+        \hline
+        \includegraphics[width=0.1\textwidth]{./assets/Q5/su/umb_f1.png} & 3 & 5\\
+        \hline
+        \includegraphics[width=0.1\textwidth]{./assets/Q5/su/umb_f2.png} & 3 & 10\\
+        \hline
+        \end{tabular}
+    \end{center}
+    \caption{Sucess and failure case examples}
+    
+    \label{table:umb_su}
+\end{table}
+
+From Figure \ref{table:cat_su}, it seems like this RF classifier is better at the image of wild\_cat containing whole cat bodies.
+
+From Figure \ref{table:umb_su}, this RF classifier is better at umbrella which has triangular stripes. Otherwise, it categorise umbrella image into wrong class.
+
+
+
+
 
 
 
 
 {\small
 \bibliographystyle{ieee}
-%\bibliography{egbib}
+\bibliography{egbib}
 }
 
 \end{document}

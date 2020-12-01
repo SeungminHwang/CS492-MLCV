@@ -7,7 +7,7 @@ function [ data_train, data_query ] = getData( MODE )
 %   3. Toy_Circle
 %   4. Caltech 101
 
-showImg = 0; % Show training & testing images and their image feature vector (histogram representation)
+showImg = 1; % Show training & testing images and their image feature vector (histogram representation)
 
 PHOW_Sizes = [4 8 10]; % Multi-resolution, these values determine the scale of each layer.
 PHOW_Step = 8; % The lower the denser. Select from {2,4,8,16}
@@ -123,12 +123,15 @@ switch MODE
         disp('Building visual codebook...')
         num_desc = 10e4;
         
+        disp("whole descriptors");
+        disp(size(cat(2, desc_tr{:})));
+        
         % Build visual vocabulary (codebook) for 'Bag-of-Words method'
         desc_sel = single(vl_colsubset(cat(2,desc_tr{:}), num_desc)); % Randomly select 100k SIFT descriptors for clustering
-        %disp(size(desc_sel));
+        disp(size(desc_sel));
         
         % K-means clustering
-        numBins = 7; % for instance,
+        numBins = 64; % for instance,
         
         
         % write your own codes here
@@ -139,71 +142,13 @@ switch MODE
         num_elem = 15; % Each class has 15 elements
         
         
-        % value to return
-        % data_train: n by ((hist, label))
-        %           : ex) data_train[k][
-        %data_train = cell(num_class*num_elem, 3);
-        
-        
         % https://www.vlfeat.org/matlab/vl_kmeans.html
         % l1 for manhattan distance
         % l2 for euclidian distance
+        tic;
         [centers, assignments] = vl_kmeans(desc_sel, numBins, 'distance', 'l2');
-        disp(size(centers));
-        
-        %{
-        
-        for i = 1:num_class
-            disp(i);
-            for j = 1:num_elem
-                % Do some process for each Img
-                
-                
-                
-                
-                % descriptors of class i, jth img
-                % 128 by (num of descriptor) matrix
-                % number of descriptors may be different by image
-                desc_ij = double(desc_tr{i, j}); 
-                
-                
-                % 1. K-means clustering(using internal lib)
-                X = transpose(desc_ij);
-                [idx, C] = kmeans(X, numBins);
-                
-                
-                % 2. Assign the nearest descriptor for each class mean
-                [K, d] = size(C); % k by n matrix C, k is num of clusters
-                
-                codewords = cell(1, K);
-                hist = zeros(1, K);
-                
-                
-                for k = 1:K
-                    cluster_center = C(k,:); % extract kth row(cluster center vector in d dim)
-                    descriptors = transpose(desc_sel); % 100K descriptors
-                    
-                    % compute Euclidean distance
-                    distances = sqrt(sum(bsxfun(@minus, descriptors, cluster_center).^2, 2));
-                    
-                    % find the closest
-                    closest = descriptors(find(distances == min(distances)), :);
-                    
-                    
-                    % assign value to hist_matrix and codewords
-                    [freq, temp] = size(X(idx == k, 1));
-                    hist(k) = freq;
-                    codewords(k) = {closest(1,:)};
-                    
-                end
-                
-                % training Dataset
-                data_train((i - 1)*15 + j,:) = {hist, codewords, i};
-                %disp(data_train((i - 1)*15 + j, :));
-                
-            end
-        end
-        %}
+        kmeans_time = toc;
+        fprintf('kmeans_time %f\n', kmeans_time);
         
         
                   
@@ -213,7 +158,8 @@ switch MODE
         % write your own codes here
         % ...
         
-        data_train = zeros(num_class*num_elem, numBins);
+        tic;
+        data_train = zeros(num_class*num_elem, numBins + 1);
         for i = 1:num_class
             for j = 1:num_elem
                 desc_ij = double(desc_tr{i, j});
@@ -221,7 +167,7 @@ switch MODE
                 %disp(size(desc_ij));
                 
                 
-                for k = 1:num_desc
+                for k = 1:num_desc % for each descriptor, assign to minimum distance cluster
                     feature = desc_ij(:,k);
                     min_dist = inf;
                     idx = 1;
@@ -234,13 +180,13 @@ switch MODE
                         end
                     end
                     data_train((i-1)*num_elem+j,idx) = data_train((i-1)*num_elem+j,idx) + 1;
+                    data_train((i-1)*num_elem+j, end) = i; % Label
                 end
                 
             end
         end
-        
-        
-  
+        train_qunat_time = toc;
+        fprintf('train_qunat_time %f\n', train_qunat_time);
         
         % Clear unused varibles to save memory
         clearvars desc_tr desc_sel
@@ -249,8 +195,8 @@ end
 switch MODE
     case 'Caltech'
         if showImg
-        figure('Units','normalized','Position',[.05 .1 .4 .9]);
-        suptitle('Test image samples');
+            figure('Units','normalized','Position',[.05 .1 .4 .9]);
+            suptitle('Test image samples');
         end
         disp('Processing testing images...');
         cnt = 1;
@@ -297,6 +243,9 @@ switch MODE
         % value to return
         %data_query = cell(num_class*num_elem, 3);
         
+        
+        
+        tic;
         data_query = zeros(num_class*num_elem, numBins);
         for i = 1:num_class
             for j = 1:num_elem
@@ -316,10 +265,13 @@ switch MODE
                         end
                     end
                     data_query((i-1)*num_elem+j,idx) = data_query((i-1)*num_elem+j,idx) + 1;
+                    %data_query((i-1)*num_elem + j, k) = {feature, idx};
                 end
                 
             end
         end
+        test_quant_t = toc;
+        fprintf('test_quant_t %f\n', test_quant_t);
         
         
         
