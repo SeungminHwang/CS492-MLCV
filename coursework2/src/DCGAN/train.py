@@ -14,7 +14,7 @@ import numpy as np
 import math
 from time import time
 torch.set_printoptions(threshold=math.inf)
-
+torch.set_default_dtype(torch.float32)
 
 def main():
     transform = transforms.Compose([transforms.Resize((64, 64), interpolation=Image.BICUBIC),
@@ -30,8 +30,9 @@ def main():
     train_data = dsets.MNIST(root='../data/', train=True, transform=transform, download=True)
     train_loader = dataloader.DataLoader(train_data, batch_size=batch_size, shuffle=False, num_workers=4)
 
-    generator = model.Generator().to(device)
-    discriminator = model.Discriminator().to(device)
+    
+    generator = model.Generator().float().to(device)
+    discriminator = model.Discriminator().float().to(device)
     print(generator)
     print(discriminator)
 
@@ -54,8 +55,8 @@ def main():
             # for i in range(k):
             discriminator.zero_grad()
             batch_size = trainData[0].size(0)
-            target_real = torch.full((batch_size, 1), real_label).to(device)
-            target_fake = torch.full((batch_size, 1), fake_label).to(device)
+            target_real = torch.full((batch_size, 1), real_label).float().to(device)
+            target_fake = torch.full((batch_size, 1), fake_label).float().to(device)
             noise = torch.randn(batch_size, 100, 1, 1, device=device)
             gen_im = generator(noise)
             real_out = discriminator(trainData[0].to(device))
@@ -71,7 +72,7 @@ def main():
             optimD.step()
 
             generator.zero_grad()
-            target_real = torch.full((batch_size, 1), real_label).to(device)
+            target_real = torch.full((batch_size, 1), real_label).float().to(device)
             noise = torch.randn(batch_size, 100, 1, 1, device=device)
             gen_im = generator(noise)
             gen_out = discriminator(gen_im)
@@ -97,6 +98,8 @@ def main():
     print("end, time: {}".format(time() - start))
     z = torch.randn(1, 100, 1, 1, device=device)
     gen_im = generator(z)
+    
+    print(type(get_im), type(generator), type(discriminator))
     return gen_im, generator, discriminator
 
 
