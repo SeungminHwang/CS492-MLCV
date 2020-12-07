@@ -20,23 +20,23 @@ def main():
     transform = transforms.Compose([transforms.Resize((64, 64), interpolation=Image.BICUBIC),
                                     transforms.ToTensor(),
                                     transforms.Normalize(mean=(0.5,), std=(0.5,))])
-    batch_size = 8
-    epochs = 60
+    batch_size = 128
+    epochs = 5
 
     is_cuda = torch.cuda.is_available()
     device = torch.device('cuda' if is_cuda else 'cpu')
     print(device)
 
     train_data = dsets.MNIST(root='../data/', train=True, transform=transform, download=True)
-    train_loader = dataloader.DataLoader(train_data, batch_size=batch_size, shuffle=False, num_workers=4)
+    train_loader = dataloader.DataLoader(train_data, batch_size=batch_size, shuffle=False, num_workers=2)
 
-    generator = model.Generator().to(device)
-    discriminator = model.Discriminator().to(device)
+    generator = model.Generator().float().to(device)
+    discriminator = model.Discriminator().float().to(device)
     print(generator)
     print(discriminator)
 
-    optimD = optim.Adam(discriminator.parameters(), lr=1e-4, betas=(0.5, 0.999))
-    optimG = optim.Adam(generator.parameters(), lr=1e-4, betas=(0.5, 0.999))
+    optimD = optim.Adam(discriminator.parameters(), lr=2e-4, betas=(0.5, 0.999))
+    optimG = optim.Adam(generator.parameters(), lr=2e-4, betas=(0.5, 0.999))
     criterion = nn.BCELoss()
 
     fixed_noise = torch.randn(batch_size, 100, 1, 1, device=device)
@@ -54,8 +54,8 @@ def main():
             # for i in range(k):
             discriminator.zero_grad()
             batch_size = trainData[0].size(0)
-            target_real = torch.full((batch_size, 1), real_label).to(device)
-            target_fake = torch.full((batch_size, 1), fake_label).to(device)
+            target_real = torch.full((batch_size, 1), real_label).float().to(device)
+            target_fake = torch.full((batch_size, 1), fake_label).float().to(device)
             noise = torch.randn(batch_size, 100, 1, 1, device=device)
             gen_im = generator(noise)
             real_out = discriminator(trainData[0].to(device))
