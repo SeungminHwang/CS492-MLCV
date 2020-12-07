@@ -21,7 +21,7 @@ def main():
                                     transforms.ToTensor(),
                                     transforms.Normalize(mean=(0.5,), std=(0.5,))])
     batch_size = 128
-    epochs = 60
+    epochs = 5
 
     is_cuda = torch.cuda.is_available()
     device = torch.device('cuda' if is_cuda else 'cpu')
