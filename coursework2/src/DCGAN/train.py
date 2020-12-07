@@ -20,7 +20,7 @@ def main():
     transform = transforms.Compose([transforms.Resize((64, 64), interpolation=Image.BICUBIC),
                                     transforms.ToTensor(),
                                     transforms.Normalize(mean=(0.5,), std=(0.5,))])
-    batch_size = 8
+    batch_size = 128
     epochs = 60
 
     is_cuda = torch.cuda.is_available()
