@@ -12,19 +12,28 @@ import os
 import cv2
 import numpy as np
 import math
+import argparse
 from time import time
 torch.set_printoptions(threshold=math.inf)
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--save", type=str, required=True, help="folder to save model and generated images")
+parser.add_argument("--gpu", type=int, default=0, help="gpu to use")
+parser.add_argument("--lr1", type=float, default=1e-4, help="learning rate for Generator")
+parser.add_argument("--lr2", type=float, default=1e-4, help="learning rate for Discriminator")
+parser.add_argument("--epoch", type=int, default=5, help="epochs to run")
+parser.add_argument("--batch_size", type=int, default=8, help="batch size")
+args = parser.parse_args()
 
 def main():
     transform = transforms.Compose([transforms.Resize((64, 64), interpolation=Image.BICUBIC),
                                     transforms.ToTensor(),
                                     transforms.Normalize(mean=(0.5,), std=(0.5,))])
-    batch_size = 128
-    epochs = 5
+    batch_size = args.batch_size
+    epochs = args.epoch
 
     is_cuda = torch.cuda.is_available()
-    device = torch.device('cuda' if is_cuda else 'cpu')
+    device = torch.device('cuda:{}'.format(args.gpu) if is_cuda else 'cpu')
     print(device)
 
     train_data = dsets.MNIST(root='../data/', train=True, transform=transform, download=True)
@@ -35,8 +44,8 @@ def main():
     print(generator)
     print(discriminator)
 
-    optimD = optim.Adam(discriminator.parameters(), lr=1e-4, betas=(0.5, 0.999))
-    optimG = optim.Adam(generator.parameters(), lr=1e-4, betas=(0.5, 0.999))
+    optimD = optim.Adam(discriminator.parameters(), lr=args.lr2, betas=(0.5, 0.999))
+    optimG = optim.Adam(generator.parameters(), lr=args.lr1, betas=(0.5, 0.999))
     criterion = nn.BCELoss()
 
     fixed_noise = torch.randn(batch_size, 100, 1, 1, device=device)
@@ -44,7 +53,7 @@ def main():
     fake_label = 0
     start = time()
 
-    outf = "save"
+    outf = args.save
     if not os.path.isdir(outf):
         os.mkdir(outf)
 
