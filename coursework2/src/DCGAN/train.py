@@ -21,9 +21,10 @@ parser.add_argument("--save", type=str, required=True, help="folder to save mode
 parser.add_argument("--gpu", type=int, default=0, help="gpu to use")
 parser.add_argument("--lr1", type=float, default=1e-4, help="learning rate for Generator")
 parser.add_argument("--lr2", type=float, default=1e-4, help="learning rate for Discriminator")
-parser.add_argument("--epoch", type=int, default=5, help="epochs to run")
-parser.add_argument("--batch_size", type=int, default=8, help="batch size")
+parser.add_argument("--epoch", type=int, default=10, help="epochs to run")
+parser.add_argument("--batch_size", type=int, default=16, help="batch size")
 args = parser.parse_args()
+
 
 def main():
     transform = transforms.Compose([transforms.Resize((64, 64), interpolation=Image.BICUBIC),
@@ -41,8 +42,6 @@ def main():
 
     generator = model.Generator().to(device)
     discriminator = model.Discriminator().to(device)
-    print(generator)
-    print(discriminator)
 
     optimD = optim.Adam(discriminator.parameters(), lr=args.lr2, betas=(0.5, 0.999))
     optimG = optim.Adam(generator.parameters(), lr=args.lr1, betas=(0.5, 0.999))

@@ -8,6 +8,7 @@ import torchvision.datasets as dsets
 import torchvision.utils as vutils
 import torchvision.transforms as transforms
 from PIL import Image
+import numpy as np
 import os
 import cv2
 import numpy as np
@@ -54,12 +55,11 @@ def main():
     optimG = optim.Adam(generator.parameters(), lr=args.lr1, betas=(0.5, 0.999))
     criterion = nn.BCELoss()
     
-    fixed_noise = torch.randn(batch_size, 100, 1, 1, device=device)
+    fixed_noise = torch.randn(100, 100, 1, 1, device=device)
+    fixed_label = torch.tensor([np.eye(10) for _ in range(10)]).transpose_(0, 1).reshape(100, 10, 1, 1).float().to(device)
     real_label = 1
     fake_label = 0
     start = time()
-    
-    
     outf = args.save
     
     if not os.path.isdir(outf):
@@ -68,8 +68,8 @@ def main():
 
     # processor
     onehot = torch.zeros(10, 10)
-    onehot = onehot.scatter_(1, torch.LongTensor([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]).view(10,1), 1).view(10, 10, 1, 1)
-    fill = torch.zeros([10, 10, 64, 64])
+    onehot = onehot.scatter_(1, torch.LongTensor([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]).view(10,1), 1).view(10, 10, 1, 1).to(device)
+    fill = torch.zeros([10, 10, 64, 64]).to(device)
     for i in range(10):
         fill[i,i,:, :] = 1
     
@@ -86,7 +86,7 @@ def main():
             
             # cgan    
             z_ = torch.randn((batch_size, 100)).view(-1, 100, 1, 1)
-            y_ = (torch.rand(batch_size, 1)*10).type(torch.LongTensor).squeeze()
+            y_ = trainData[1]
             y_label_ = onehot[y_] # represent labels by hot-vector
             y_fill_ = fill[y_]
             
@@ -122,13 +122,10 @@ def main():
                      disLoss.item(), genLoss.item(), D_x, D_G_z1, D_G_z2))
             
             if index % 100 == 0:
-                vutils.save_image(trainData[0].to(device),
-                                  '%s/real_samples.png' % outf,
-                                  normalize=True)
-                fake = generator(fixed_noise, y_label_)
+                fake = generator(fixed_noise, fixed_label)
                 vutils.save_image(fake.detach(),
                                   '%s/fake_samples_epoch_%03d.png' % (outf, epoch),
-                                  normalize=True)
+                                  normalize=True, nrow=10)
             
         torch.save(generator.state_dict(), '%s/netG_epoch_%d.pth' % (outf, epoch))
         torch.save(discriminator.state_dict(), '%s/netD_epoch_%d.pth' % (outf, epoch))
