@@ -4,9 +4,9 @@ import torchvision.transforms as transforms
 
 
 class Generator(nn.Module):
-    def __init__(self):
+    def __init__(self, args):
         super(Generator, self).__init__()
-        ch = 256
+        ch = args.ngf
         self.conv1  = nn.ConvTranspose2d(100, ch*8, 4, 1, 0, bias=False)
         self.bn1    = nn.BatchNorm2d(ch*8)
         self.conv2  = nn.ConvTranspose2d(ch*8, ch*4, 4, 2, 1, bias=False)
@@ -22,10 +22,10 @@ class Generator(nn.Module):
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
-                m.weight.data.normal_(0.0, 0.02)
+                torch.nn.init.normal_(m.weight, 0.0, 0.02)
             elif isinstance(m, nn.BatchNorm2d):
-                m.weight.data.normal_(1.0, 0.02)
-                m.bias.data.fill_(0)
+                torch.nn.init.normal_(m.weight, 1.0, 0.02)
+                torch.nn.init.zeros_(m.bias)
 
     def forward(self, noise):
         c1 = self.relu(self.bn1(self.conv1(noise)))
@@ -38,9 +38,9 @@ class Generator(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self):
+    def __init__(self, args):
         super(Discriminator, self).__init__()
-        ch = 128
+        ch = args.ndf
         self.conv1 = nn.Conv2d(1,    ch, 4, 2, 1, bias=False)
         self.conv2 = nn.Conv2d(ch,  ch*2, 4, 2, 1, bias=False)
         self.bn2 = nn.BatchNorm2d(ch*2)

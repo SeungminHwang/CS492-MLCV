@@ -19,8 +19,11 @@ torch.set_printoptions(threshold=math.inf)
 parser = argparse.ArgumentParser()
 parser.add_argument("--save", type=str, required=True, help="folder to save model and generated images")
 parser.add_argument("--gpu", type=int, default=0, help="gpu to use")
-parser.add_argument("--lr1", type=float, default=1e-4, help="learning rate for Generator")
-parser.add_argument("--lr2", type=float, default=1e-4, help="learning rate for Discriminator")
+parser.add_argument("--lr1", type=float, default=2e-4, help="learning rate for Generator")
+parser.add_argument("--lr2", type=float, default=2e-4, help="learning rate for Discriminator")
+parser.add_argument('--nz', type=int, default=100, help='size of the latent z vector')
+parser.add_argument('--ngf', type=int, default=128)
+parser.add_argument('--ndf', type=int, default=128)
 parser.add_argument("--epoch", type=int, default=10, help="epochs to run")
 parser.add_argument("--batch_size", type=int, default=16, help="batch size")
 args = parser.parse_args()
@@ -40,8 +43,8 @@ def main():
     train_data = dsets.MNIST(root='../data/', train=True, transform=transform, download=True)
     train_loader = dataloader.DataLoader(train_data, batch_size=batch_size, shuffle=False, num_workers=4)
 
-    generator = model.Generator().to(device)
-    discriminator = model.Discriminator().to(device)
+    generator = model.Generator(args).to(device)
+    discriminator = model.Discriminator(args).to(device)
 
     optimD = optim.Adam(discriminator.parameters(), lr=args.lr2, betas=(0.5, 0.999))
     optimG = optim.Adam(generator.parameters(), lr=args.lr1, betas=(0.5, 0.999))
@@ -70,7 +73,7 @@ def main():
             disLoss1 = criterion(real_out, target_real)
             disLoss1.backward()
             D_x = real_out.mean().item()
-            gen_out = discriminator(gen_im)
+            gen_out = discriminator(gen_im.detach())
             D_G_z1 = gen_out.mean().item()
 
             disLoss2 = criterion(gen_out, target_fake)
@@ -80,12 +83,10 @@ def main():
 
             generator.zero_grad()
             target_real = torch.full((batch_size, 1), real_label).to(device)
-            noise = torch.randn(batch_size, 100, 1, 1, device=device)
-            gen_im = generator(noise)
             gen_out = discriminator(gen_im)
-            D_G_z2 = gen_out.mean().item()
             genLoss = criterion(gen_out, target_real)
             genLoss.backward()
+            D_G_z2 = gen_out.mean().item()
             optimG.step()
             print('[%d/%d][%d/%d] Loss_D: %.4f Loss_G: %.4f D(x): %.4f D(G(z)): %.4f / %.4f'
                   % (epoch, epochs, index, len(train_loader),
